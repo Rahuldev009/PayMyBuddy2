@@ -59,6 +59,7 @@ public class ConnectionController {
         try {
             logger.debug("adding friend");
             connectionService.addConnection(connection);
+            modelAndView.setViewName("connection_add_success");
         } catch (Exception e) {
             logger.debug("if the person is already added as friend");
             modelAndView.setViewName("connection_fail_error");
