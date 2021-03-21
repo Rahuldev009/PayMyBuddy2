@@ -32,6 +32,9 @@ build/
 ### VS Code ###
 .vscode/
 
+### DS files ###
+.DS_Store
+
 ### log files ###
 *.log
 *.gz

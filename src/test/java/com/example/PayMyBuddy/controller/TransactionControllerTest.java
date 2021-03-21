@@ -1,10 +1,13 @@
 package com.example.PayMyBuddy.controller;
 
+import com.example.PayMyBuddy.dto.TransactionDto;
 import com.example.PayMyBuddy.model.Connection;
 import com.example.PayMyBuddy.model.Transaction;
 import com.example.PayMyBuddy.model.User;
 import com.example.PayMyBuddy.service.ConnectionService;
+import com.example.PayMyBuddy.service.CustomUserDetails;
 import com.example.PayMyBuddy.service.TransactionService;
+import com.example.PayMyBuddy.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +28,12 @@ class TransactionControllerTest {
 
     @Mock
     TransactionService transactionService;
+    @Mock
+    UserService userService;
 
+
+    CustomUserDetails customUserDetails;
+    TransactionDto transactionDto= new TransactionDto();
 
     @BeforeEach
     void setUp() {
@@ -58,6 +67,14 @@ class TransactionControllerTest {
         List <Transaction> list = new ArrayList<>();
         list.add(transaction1);
         list.add(transaction2);
+        transactionDto.setCurrency("USD");
+        transactionDto.setAmount(12.00);
+        transactionDto.setDescription("grocery");
+        transactionDto.setName("amy");
+        transactionDto.setUserId(1);
+        transactionDto.setReceiverId(2);
+        customUserDetails = new CustomUserDetails(userid1);
+        Mockito.when(userService.findByEmail("amy@gmail.com")).thenReturn(userid1);
         Mockito.when(transactionService.getTransaction(1)).thenReturn(transaction1);
         Mockito.when(transactionService.getAllTransaction()).thenReturn(list);
         Mockito.when(transactionService.deleteTransaction(1)).thenReturn(transaction1);
@@ -85,5 +102,7 @@ class TransactionControllerTest {
 
     @Test
     void addTransaction() {
+        ModelAndView modelAndView = transactionController.addTransaction(customUserDetails,transactionDto);
+        assertEquals("transaction_fail",modelAndView.getViewName());
     }
 }

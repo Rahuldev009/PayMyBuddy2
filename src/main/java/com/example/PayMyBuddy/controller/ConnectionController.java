@@ -49,6 +49,8 @@ public class ConnectionController {
         Connection connection = new Connection();
         connection.setUser(userService.findByEmail(customUserDetails.getUsername()));
         connection.setFriend(userService.findByEmail(connectionDto.getEmail()));
+        logger.info("user id " + connection.getUser().getId());
+        logger.info("friend id " + connection.getFriend().getId());
         if (connection.getUser().getId() == connection.getFriend().getId()) {
             logger.debug("trying to add someone as his own friend");
             modelAndView.setViewName("connection_fail");
