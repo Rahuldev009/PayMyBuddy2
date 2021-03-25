@@ -87,7 +87,6 @@ public class UserDto {
     public String toString() {
         return "UserDto{" +
                 "email='" + email + '\'' +
-                ", password='" + password + '\'' +
                 ", userName='" + userName + '\'' +
                 ", balance=" + balance +
                 ", currency='" + currency + '\'' +

@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.ui.Model;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
@@ -31,6 +32,8 @@ class UserControllerTest {
     UserService userService;
     @Mock
     AccountService accountService;
+    @Mock
+    Model model;
 
     CustomUserDetails customUserDetails;
     UserDto userDto = new UserDto();
@@ -106,7 +109,13 @@ class UserControllerTest {
 
     @Test
     void updateUser() {
-        ModelAndView modelAndView = userController.updateUser(customUserDetails,userDto);
-        assertEquals("add_money_success",modelAndView.getViewName());
+        ModelAndView modelAndView = userController.updateUser(customUserDetails,userDto,model);
+        assertEquals("redirect:/profile",modelAndView.getViewName());
+    }
+
+    @Test
+    void getUserInfo() {
+        ModelAndView modelAndView = userController.getUserInfo(customUserDetails,model);
+        assertEquals("profile",modelAndView.getViewName());
     }
 }

@@ -44,18 +44,39 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider(authenticationProvider());
     }
 
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/landingPage").authenticated()
+                .antMatchers("/home").authenticated()
+                .antMatchers("/login-error").permitAll()
+                .antMatchers("/signup_form").permitAll()
                 .anyRequest().permitAll()
                 .and()
                 .formLogin()
                 .usernameParameter("email")
-                .defaultSuccessUrl("/landingPage")
+                .defaultSuccessUrl("/home")
+                .loginPage("/login") // extra
+                .failureUrl("/login-error")
                 .permitAll()
                 .and()
                 .logout().logoutSuccessUrl("/").permitAll();
     }
+
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {
+//        http
+//                .authorizeRequests()
+//                .antMatchers("/resources/**").permitAll()
+//                .anyRequest().authenticated()
+//                .and()
+//                .formLogin()
+//                .loginPage("/login")
+//                .permitAll()
+//                .and()
+//                .logout()
+//                .permitAll();
+//    }
+
 
 }

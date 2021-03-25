@@ -1,8 +1,11 @@
 package com.example.PayMyBuddy.controller;
 
+import com.example.PayMyBuddy.dto.ConnectionDto;
 import com.example.PayMyBuddy.dto.TransactionDto;
+import com.example.PayMyBuddy.model.Connection;
 import com.example.PayMyBuddy.model.Transaction;
 import com.example.PayMyBuddy.model.User;
+import com.example.PayMyBuddy.service.ConnectionService;
 import com.example.PayMyBuddy.service.CustomUserDetails;
 import com.example.PayMyBuddy.service.TransactionService;
 import com.example.PayMyBuddy.service.UserService;
@@ -11,7 +14,11 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
@@ -22,11 +29,14 @@ public class TransactionController {
 
     private TransactionService transactionService;
     private UserService userService;
+    private ConnectionService connectionService;
 
     @Autowired
-    public void TransactionController(TransactionService transactionService, UserService userService) {
+    public void TransactionController(TransactionService transactionService, UserService userService,
+                                      ConnectionService connectionService) {
         this.transactionService = transactionService;
         this.userService = userService;
+        this.connectionService = connectionService;
     }
 
     @RequestMapping(value = "/transactions/{id}", method = RequestMethod.GET)
@@ -37,16 +47,27 @@ public class TransactionController {
     }
 
     @RequestMapping(value = "/transactions", method = RequestMethod.GET)
-    public List<Transaction> getAllTransactions() {
+    public ModelAndView getAllTransactions(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+        ModelAndView modelAndView = new ModelAndView();
+        model.addAttribute("transactionDto", new TransactionDto());
+        modelAndView.addObject(model);
+        int id = userService.findByEmail(customUserDetails.getUsername()).getId();
         List<Transaction> listOfTransactions = transactionService.getAllTransaction();
-        logger.info("All Transaction info " + listOfTransactions.toString());
-        return listOfTransactions;
+        List<TransactionDto> transactionsDtoList = transactionService.getTransactionList(listOfTransactions, id);
+        List<Connection> listOfConnections = connectionService.getAllConnections();
+        List<ConnectionDto> connectionDtoList = connectionService.getConnectionList(listOfConnections, id);
+        modelAndView.addObject("transactionsDtoList", transactionsDtoList);
+        modelAndView.addObject("connectionDtoList", connectionDtoList);
+        modelAndView.setViewName("transaction");
+        return modelAndView;
     }
 
     @PostMapping("/transactions")// Add a transaction into DB
     public ModelAndView addTransaction(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                       TransactionDto transactionDto) {
+                                       TransactionDto transactionDto, Model model) {
         ModelAndView modelAndView = new ModelAndView();
+        model.addAttribute("transactionDto", new TransactionDto());
+        modelAndView.addObject(model);
         Transaction transaction = new Transaction();
         User user = userService.findByEmail(customUserDetails.getUsername());
         transaction.setUser(user);
@@ -59,15 +80,14 @@ public class TransactionController {
             transactionService.addTransaction(transaction);
             user.setBalance((availBalance) - (transactionAmount + (transactionAmount * 0.005)));
             userService.updateUser(user);
-            user = userService.getUser(user.getId());
-            modelAndView.addObject(user);
-            modelAndView.setViewName("transaction_success");
+            modelAndView.addObject("transactionDto", new TransactionDto());
+            modelAndView.setViewName("redirect:/transactions");
         } else {
-            modelAndView.setViewName("transaction_fail");
+            modelAndView.setViewName("/transaction-error");
         }
         return modelAndView;
     }
-    
+
     @RequestMapping(value = "/transactions/{id}", method = RequestMethod.DELETE)
     public Transaction deleteTransaction(@PathVariable("id") int id) {
         Transaction transaction = transactionService.deleteTransaction(id);

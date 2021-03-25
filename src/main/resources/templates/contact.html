@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Home page</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <meta charset="ISO-8859-1">
+    <style>
+        .navbar {
+    background-color: #white;
+}
+
+.navbar-center {
+    display: inline-block;
+     padding-top: 0.3125rem;
+     padding-bottom: 0.3125rem;
+     margin-right: 1rem;
+     font-size: 1.25rem;
+     line-height: inherit;
+     white-space: nowrap;
+    color: #fff;
+    position: absolute;
+    left: 50%;
+    transform: translatex(-50%);
+    }
+
+    .navbar-height {
+  height: 2.25rem;
+}
+
+ .navbar {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.userinfo {
+     text-align: center;
+     bottom-margin: 20px;
+     font-size: 20px;
+ }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-dark bg-dark navbar-height">
+        <a class="navbar-brand" href="/">
+            <div class="brand-sizing">
+                <i class="fa fa-circle fa-xs"></i>
+                <i class="fa fa-circle fa-xs"></i>
+                <i class="fa fa-circle fa-xs"></i>
+            </div>
+        </a>
+        <label class="navbar-center">Pay My Buddy</label>
+    </nav>
+</header>
+<nav class="navbar navbar-light bg-white navbar-height">
+    <button type="button" class="btn btn-success">Pay My Buddy</button>
+    <ul class="nav">
+        <li class="nav-item">
+            <a class="nav-link" href="/home">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/transactions">Transfer</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/profile">Profile</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/contact">Contact</a>
+        </li>
+        <div>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn btn-link">log out</button>
+            </form>
+        </div>
+    </ul>
+</nav>
+<nav class="navbar navbar-light bg-light navbar-height">
+    <ul class="nav"><!-- left-->
+        <li class="nav-item">
+            <a class="nav-link" href="/home">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">/</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link disabled" href="#">contact</a>
+        </li>
+    </ul>
+</nav>
+<br>
+<br>
+<br>
+<br>
+<div class="container">
+    <div class="userinfo">
+        <h2 class="text-center">Email Us</h2>
+        <p class="text-center">paymybuddy@pmb.com</p>
+        <h2 class="text-center">Contact Us</h2>
+        <p class="text-center">1-800-123-1123</p>
+    </div>
+</div>
+</body>
+</html>

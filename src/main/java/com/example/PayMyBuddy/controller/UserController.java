@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -34,6 +35,30 @@ public class UserController {
         User user = userService.getUser(id);
         logger.info("User info by Id " + user.toString());
         return user;
+    }
+
+    @RequestMapping(value = "/profile", method = RequestMethod.GET)
+    public ModelAndView getUserInfo(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+        ModelAndView modelAndView = new ModelAndView();
+        model.addAttribute("userDto", new UserDto());
+        modelAndView.addObject(model);
+        int id = userService.findByEmail(customUserDetails.getUsername()).getId();
+        List<Account> accountList = accountService.getAllAccounts();
+        UserDto userDto = new UserDto();
+        Account account = new Account();
+        for (int i = 0; i < accountList.size(); i++) {
+            if (accountList.get(i).getUser().getId() == id) {
+                account = accountList.get(i);
+                break;
+            }
+        }
+        modelAndView.addObject("amount", userService.getUser(id).getBalance());
+        modelAndView.addObject("name", userService.getUser(id).getUserName());
+        modelAndView.addObject("bank", account.getBank());
+        modelAndView.addObject("accno", account.getAccountNo());
+        modelAndView.addObject("userDto", userDto);
+        modelAndView.setViewName("profile");
+        return modelAndView;
     }
 
     @RequestMapping(value = "/getUserEmail", method = RequestMethod.GET)
@@ -68,14 +93,16 @@ public class UserController {
         return modelAndView;
     }
 
-    @RequestMapping("/updateBalance")
-    public ModelAndView updateUser(@AuthenticationPrincipal CustomUserDetails customUserDetails, UserDto userDto) {
+    @RequestMapping("/profile")
+    public ModelAndView updateUser(@AuthenticationPrincipal CustomUserDetails customUserDetails, UserDto userDto, Model model) {
         ModelAndView modelAndView = new ModelAndView();
+        model.addAttribute("userDto", new UserDto());
         User user = userService.findByEmail(customUserDetails.getUsername());
         user.setBalance(user.getBalance() + userDto.getBalance());
         logger.info("updated user info " + user.toString());
         userService.updateUser(user);
-        modelAndView.setViewName("add_money_success");
+        modelAndView.addObject("userDto", new UserDto());
+        modelAndView.setViewName("redirect:/profile");
         logger.info("money is added to the account");
         return modelAndView;
     }

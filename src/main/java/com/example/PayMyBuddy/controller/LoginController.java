@@ -1,10 +1,6 @@
 package com.example.PayMyBuddy.controller;
 
-import com.example.PayMyBuddy.dto.ConnectionDto;
-import com.example.PayMyBuddy.dto.TransactionDto;
 import com.example.PayMyBuddy.dto.UserDto;
-import com.example.PayMyBuddy.model.Connection;
-import com.example.PayMyBuddy.model.Transaction;
 import com.example.PayMyBuddy.model.User;
 import com.example.PayMyBuddy.service.ConnectionService;
 import com.example.PayMyBuddy.service.CustomUserDetails;
@@ -18,8 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.List;
+import org.springframework.web.servlet.ModelAndView;
 
 
 @Controller
@@ -38,10 +33,18 @@ public class LoginController {
         this.userService = userService;
     }
 
-    @RequestMapping(value = "/index")
-    public String viewHomePage() {
-        logger.info("returning home page");
-        return "index";
+    @RequestMapping(value = "/")
+    public ModelAndView viewHomePage(ModelAndView modelAndView) {
+        logger.info("login page ");
+        modelAndView.setViewName("login");
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "/login-error")
+    public ModelAndView viewLoginError(ModelAndView modelAndView) {
+        logger.info("login error page");
+        modelAndView.setViewName("login-error");
+        return modelAndView;
     }
 
     @GetMapping("/register")
@@ -50,22 +53,19 @@ public class LoginController {
         return "signup_form";
     }
 
-    @GetMapping("/landingPage")
-    public String listUsers(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+    @GetMapping("/home")
+    public ModelAndView listUsers(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        ModelAndView modelAndView = new ModelAndView();
         User user = userService.findByEmail(customUserDetails.getUsername());
-        int id = user.getId();
-        List<Transaction> allTransaction = transactionService.getAllTransaction();
-        List<TransactionDto> transactionsDtoList = transactionService.getTransactionList(allTransaction, id);
-        List<Connection> allConnection = connectionService.getAllConnections();
-        List<ConnectionDto> connectionDtoList = connectionService.getConnectionList(allConnection, id);
-        model.addAttribute("connectionDtoList", connectionDtoList);
-        model.addAttribute("transactionsDtoList", transactionsDtoList);
-        model.addAttribute("transactionDto", new TransactionDto());
-        model.addAttribute("connectionDto", new ConnectionDto());
-        model.addAttribute("userDto", new UserDto());
-        model.addAttribute("moneyAvailable", userService.findByEmail
-                (customUserDetails.getUsername()).getBalance());
-        return "landingPage";
+        modelAndView.addObject("loggedInUser", user);
+        modelAndView.setViewName("home");
+        return modelAndView;
+    }
+
+    @GetMapping("/contact")
+    public ModelAndView contact(ModelAndView modelAndView) {
+        modelAndView.setViewName("contact");
+        return modelAndView;
     }
 
 }
